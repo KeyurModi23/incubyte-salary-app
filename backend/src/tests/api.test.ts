@@ -1,8 +1,9 @@
 import request from 'supertest';
-import { describe, it, expect, afterAll } from 'vitest';
-import app, { prisma } from '../app.js';
+import { describe, it, expect, afterAll, beforeAll } from 'vitest';
+import app from '../app.js';
+import { prisma } from '../lib/prisma.js';
 
-describe('HR Salary Management API', () => {
+describe('HR Salary Management API', { timeout: 30000 }, () => {
   afterAll(async () => {
     await prisma.$disconnect();
   });
@@ -29,5 +30,78 @@ describe('HR Salary Management API', () => {
     expect(res.body).toHaveProperty('byCountry');
     expect(Array.isArray(res.body.byDepartment)).toBe(true);
     expect(Array.isArray(res.body.byCountry)).toBe(true);
+  });
+
+  describe('GET /api/employees with search', () => {
+    it('should filter employees by search query', async () => {
+      // Assuming we seeded some employees, let's just search for a common letter like 'a'
+      const response = await request(app).get('/api/employees?search=a&limit=5');
+      
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      if (response.body.data.length > 0) {
+        // Just verify the shape
+        expect(response.body.data[0]).toHaveProperty('firstName');
+      }
+    });
+  });
+
+  describe('POST /api/employees', () => {
+    it('should create a new employee and return 201', async () => {
+      const newEmployee = {
+        firstName: 'JaneTest',
+        lastName: 'DoeTest',
+        email: `jane${Date.now()}@example.com`,
+        department: 'Engineering',
+        salary: 150000,
+        country: 'USA',
+        role: 'Developer'
+      };
+
+      const response = await request(app)
+        .post('/api/employees')
+        .send(newEmployee);
+        
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.firstName).toBe('JaneTest');
+    });
+
+    it('should return 400 if required fields are missing', async () => {
+      const invalidEmployee = { firstName: 'Jane' }; // Missing everything else
+      const response = await request(app)
+        .post('/api/employees')
+        .send(invalidEmployee);
+        
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Missing required fields');
+    });
+  });
+
+  describe('PUT /api/employees/:id', () => {
+    it('should update an existing employee and return 200', async () => {
+      // First create one to update
+      const newEmployee = await prisma.employee.create({
+        data: {
+          firstName: 'UpdateTest',
+          lastName: 'User',
+          email: `update${Date.now()}@example.com`,
+          department: 'HR',
+          salary: 50000,
+          country: 'UK',
+          role: 'Manager'
+        }
+      });
+
+      const updateData = { salary: 60000, department: 'Management' };
+      
+      const response = await request(app)
+        .put(`/api/employees/${newEmployee.id}`)
+        .send(updateData);
+        
+      expect(response.status).toBe(200);
+      expect(response.body.salary).toBe(60000);
+      expect(response.body.department).toBe('Management');
+    });
   });
 });

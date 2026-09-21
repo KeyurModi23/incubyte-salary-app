@@ -1,7 +1,12 @@
 import { Search, Bell, Sun, Moon, Menu } from 'lucide-react'
 import { useTheme } from '../ThemeProvider'
 
-export function Topbar() {
+type TopbarProps = {
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+}
+
+export function Topbar({ searchQuery, setSearchQuery }: TopbarProps) {
   const { theme, setTheme } = useTheme()
 
   return (
@@ -15,6 +20,8 @@ export function Topbar() {
           <input 
             type="text" 
             placeholder="Search employees..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="h-9 w-64 rounded-full border border-input bg-muted pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-input transition-all text-foreground placeholder:text-muted-foreground"
           />
         </div>
