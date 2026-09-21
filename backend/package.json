@@ -4,6 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
+    "dev": "tsx watch src/index.ts",
     "test": "vitest run --test-timeout=30000",
     "postinstall": "prisma skills sync || exit 0"
   },
