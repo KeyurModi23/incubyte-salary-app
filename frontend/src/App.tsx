@@ -5,6 +5,8 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { EmployeeDirectory } from '@/components/dashboard/EmployeeDirectory'
 import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts'
 import { QuickStats } from '@/components/dashboard/QuickStats'
+import { Sidebar } from '@/components/dashboard/Sidebar'
+import { Topbar } from '@/components/dashboard/Topbar'
 
 const fetchEmployees = async (page: number, limit: number) => {
   const res = await axios.get(`http://localhost:3001/api/employees?page=${page}&limit=${limit}`)
@@ -30,19 +32,28 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 flex flex-col gap-8 text-slate-900 dark:text-slate-50 font-sans">
-      <DashboardHeader total={total} />
-      
-      <main className="flex-1 grid grid-cols-1 xl:grid-cols-4 gap-8">
-        <div className="flex flex-col gap-8 xl:col-span-3">
-          <EmployeeDirectory employees={employees} loading={loading} />
-          <AnalyticsCharts analytics={analytics} loading={loading} />
-        </div>
+    <div className="min-h-screen bg-background text-foreground font-sans flex">
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Topbar />
+        
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+          <div className="max-w-[1600px] mx-auto">
+            <DashboardHeader total={total} />
+            
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+              <div className="flex flex-col gap-8 xl:col-span-3">
+                <AnalyticsCharts analytics={analytics} loading={loading} />
+                <EmployeeDirectory employees={employees} loading={loading} />
+              </div>
 
-        <div className="flex flex-col gap-6 xl:col-span-1">
-          <QuickStats total={total} loading={loading} />
-        </div>
-      </main>
+              <div className="flex flex-col gap-6 xl:col-span-1">
+                <QuickStats total={total} loading={loading} />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

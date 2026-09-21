@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Users, TrendingUp } from "lucide-react"
 
 type QuickStatsProps = {
   total: number
@@ -8,16 +9,24 @@ type QuickStatsProps = {
 
 export function QuickStats({ total, loading }: QuickStatsProps) {
   return (
-    <Card className="shadow-sm border-slate-200 dark:border-slate-800">
-      <CardHeader>
-        <CardTitle>Quick Stats</CardTitle>
+    <Card className="shadow-sm border-border bg-card text-card-foreground animate-in fade-in slide-in-from-bottom-3 duration-700">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">Total Employees</CardTitle>
       </CardHeader>
       <CardContent>
-        {loading ? <Skeleton className="h-24 w-full" /> : (
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center p-5 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Employees</span>
-              <span className="text-3xl font-bold text-slate-900 dark:text-white">{total.toLocaleString()}</span>
+        {loading ? <Skeleton className="h-16 w-full" /> : (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <span className="text-3xl font-bold text-foreground">
+                {total.toLocaleString()}
+              </span>
+              <div className="p-2 bg-muted rounded-full text-primary">
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="flex items-center text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
+              <TrendingUp className="w-3 h-3 mr-1" />
+              +12% from last month
             </div>
           </div>
         )}

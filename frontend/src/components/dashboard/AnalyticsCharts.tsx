@@ -10,8 +10,8 @@ type AnalyticsChartsProps = {
 
 export function AnalyticsCharts({ analytics, loading }: AnalyticsChartsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-      <Card className="shadow-sm border-slate-200 dark:border-slate-800">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
+      <Card className="shadow-sm border-border bg-card text-card-foreground">
         <CardHeader>
           <CardTitle>Average Salary by Department</CardTitle>
           <CardDescription>Compensation distribution across teams.</CardDescription>
@@ -19,8 +19,16 @@ export function AnalyticsCharts({ analytics, loading }: AnalyticsChartsProps) {
         <CardContent className="h-[300px]">
           {loading || !analytics ? <Skeleton className="h-full w-full" /> : (
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics.byDepartment} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <XAxis dataKey="department" tick={{ fontSize: 12, fill: '#64748b' }} tickLine={false} axisLine={false} />
+              <BarChart data={analytics.byDepartment} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
+                <XAxis 
+                  dataKey="department" 
+                  tick={{ fontSize: 11, fill: '#64748b' }} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  angle={-45} 
+                  textAnchor="end"
+                  interval={0}
+                />
                 <YAxis tickFormatter={(val) => `$${val / 1000}k`} tick={{ fontSize: 12, fill: '#64748b' }} tickLine={false} axisLine={false} />
                 <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value: any) => [`$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, 'Average Salary']} />
                 <Bar dataKey="avgSalary" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
@@ -30,7 +38,7 @@ export function AnalyticsCharts({ analytics, loading }: AnalyticsChartsProps) {
         </CardContent>
       </Card>
 
-      <Card className="shadow-sm border-slate-200 dark:border-slate-800">
+      <Card className="shadow-sm border-border bg-card text-card-foreground">
         <CardHeader>
           <CardTitle>Headcount by Country</CardTitle>
           <CardDescription>Global distribution of our workforce.</CardDescription>
