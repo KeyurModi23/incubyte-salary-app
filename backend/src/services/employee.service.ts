@@ -6,10 +6,9 @@ export const EmployeeService = {
 
     const where = search ? {
       OR: [
+        { id: { contains: search, mode: 'insensitive' as const } },
         { firstName: { contains: search, mode: 'insensitive' as const } },
         { lastName: { contains: search, mode: 'insensitive' as const } },
-        { email: { contains: search, mode: 'insensitive' as const } },
-        { department: { contains: search, mode: 'insensitive' as const } },
       ]
     } : {};
 
@@ -50,10 +49,9 @@ export const EmployeeService = {
   getAnalytics: async (search?: string) => {
     const where = search ? {
       OR: [
+        { id: { contains: search, mode: 'insensitive' as const } },
         { firstName: { contains: search, mode: 'insensitive' as const } },
         { lastName: { contains: search, mode: 'insensitive' as const } },
-        { email: { contains: search, mode: 'insensitive' as const } },
-        { department: { contains: search, mode: 'insensitive' as const } },
       ]
     } : {};
 

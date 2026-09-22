@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Search } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EditSalaryDialog } from './EditSalaryDialog'
 import { Employee } from '@/types'
@@ -12,9 +12,11 @@ type EmployeeDirectoryProps = {
   searchQuery: string
   setSearchQuery: (query: string) => void
   onRefresh: () => void
+  fetchNextPage?: () => void
+  isFetchingNextPage?: boolean
 }
 
-export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQuery, onRefresh }: EmployeeDirectoryProps) {
+export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQuery, onRefresh, fetchNextPage, isFetchingNextPage }: EmployeeDirectoryProps) {
   const [isMobile, setIsMobile] = useState(false)
   
   // Need to use layout effect or early mount effect for initial window size
@@ -32,7 +34,20 @@ export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQu
     getScrollElement: () => parentRef.current,
     estimateSize: () => isMobile ? 160 : 64, // Taller rows on mobile for vertical card layout
     overscan: 15,
+    initialRect: { width: 1000, height: 1000 } // Fixes JSDOM testing and improves first-paint
   })
+
+  const virtualItems = rowVirtualizer.getVirtualItems()
+
+  useEffect(() => {
+    const lastItem = virtualItems[virtualItems.length - 1]
+    if (!lastItem || !fetchNextPage) return
+    
+    // If we've scrolled within 10 items of the bottom, fetch the next page
+    if (lastItem.index >= employees.length - 10 && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [virtualItems, employees.length, isFetchingNextPage, fetchNextPage])
 
   return (
     <Card className="shadow-sm border-border bg-card text-card-foreground animate-in fade-in slide-in-from-bottom-4 duration-700">

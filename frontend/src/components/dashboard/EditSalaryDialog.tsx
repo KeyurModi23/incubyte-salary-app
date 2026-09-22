@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit2, Loader2 } from 'lucide-react'
-import axios from 'axios'
+import { api } from '@/services/api'
 import {
   Dialog,
   DialogContent,
@@ -59,9 +59,7 @@ export function EditSalaryDialog({ employeeId, currentSalary, employeeName, onSu
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await axios.put(`http://localhost:3001/api/employees/${employeeId}`, {
-        salary: Number(values.salary),
-      })
+      await api.employees.updateSalary(employeeId, Number(values.salary))
       
       toast({
         title: 'Salary Updated',

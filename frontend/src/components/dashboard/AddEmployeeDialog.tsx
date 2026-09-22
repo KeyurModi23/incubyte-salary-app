@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Loader2 } from 'lucide-react'
-import axios from 'axios'
+import { api } from '@/services/api'
 import {
   Dialog,
   DialogContent,
@@ -67,10 +67,11 @@ export function AddEmployeeDialog({ onSuccess }: AddEmployeeDialogProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await axios.post('http://localhost:3001/api/employees', {
+      await api.employees.create({
         ...values,
         salary: Number(values.salary),
-      })
+        country: values.country || 'USA', // Just in case, zod requires it anyway
+      } as any)
       
       toast({
         title: 'Success',

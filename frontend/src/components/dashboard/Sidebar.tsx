@@ -1,4 +1,4 @@
-import { Layers, LayoutDashboard, X } from 'lucide-react'
+import { LayoutDashboard, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import IconLogo from '../../assets/incubyte-icon.png'
 import FullLogo from '../../assets/incubyte-logo.png'

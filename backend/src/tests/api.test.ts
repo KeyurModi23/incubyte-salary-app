@@ -11,25 +11,25 @@ describe('HR Salary Management API', { timeout: 30000 }, () => {
   it('GET /api/employees should return a paginated list of employees', async () => {
     const res = await request(app).get('/api/employees?page=1&limit=10');
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('data');
-    expect(res.body).toHaveProperty('meta');
-    expect(Array.isArray(res.body.data)).toBe(true);
-    expect(res.body.data.length).toBeLessThanOrEqual(10);
+    expect(res.body.data).toHaveProperty('data');
+    expect(res.body.data).toHaveProperty('meta');
+    expect(Array.isArray(res.body.data.data)).toBe(true);
+    expect(res.body.data.data.length).toBeLessThanOrEqual(10);
     
     // Ensure it returns expected fields
-    if (res.body.data.length > 0) {
-      expect(res.body.data[0]).toHaveProperty('firstName');
-      expect(res.body.data[0]).toHaveProperty('salary');
+    if (res.body.data.data.length > 0) {
+      expect(res.body.data.data[0]).toHaveProperty('firstName');
+      expect(res.body.data.data[0]).toHaveProperty('salary');
     }
   });
 
   it('GET /api/analytics should return aggregated salary data', async () => {
     const res = await request(app).get('/api/analytics');
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('byDepartment');
-    expect(res.body).toHaveProperty('byCountry');
-    expect(Array.isArray(res.body.byDepartment)).toBe(true);
-    expect(Array.isArray(res.body.byCountry)).toBe(true);
+    expect(res.body.data).toHaveProperty('byDepartment');
+    expect(res.body.data).toHaveProperty('byCountry');
+    expect(Array.isArray(res.body.data.byDepartment)).toBe(true);
+    expect(Array.isArray(res.body.data.byCountry)).toBe(true);
   });
 
   describe('GET /api/employees with search', () => {
@@ -38,10 +38,10 @@ describe('HR Salary Management API', { timeout: 30000 }, () => {
       const response = await request(app).get('/api/employees?search=a&limit=5');
       
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body.data)).toBe(true);
-      if (response.body.data.length > 0) {
+      expect(Array.isArray(response.body.data.data)).toBe(true);
+      if (response.body.data.data.length > 0) {
         // Just verify the shape
-        expect(response.body.data[0]).toHaveProperty('firstName');
+        expect(response.body.data.data[0]).toHaveProperty('firstName');
       }
     });
   });
@@ -63,8 +63,8 @@ describe('HR Salary Management API', { timeout: 30000 }, () => {
         .send(newEmployee);
         
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.firstName).toBe('JaneTest');
+      expect(response.body.data).toHaveProperty('id');
+      expect(response.body.data.firstName).toBe('JaneTest');
     });
 
     it('should return 400 if required fields are missing', async () => {
@@ -74,7 +74,7 @@ describe('HR Salary Management API', { timeout: 30000 }, () => {
         .send(invalidEmployee);
         
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe('Missing required fields');
+      expect(response.body.message).toBe('Missing required fields');
     });
   });
 
@@ -100,8 +100,8 @@ describe('HR Salary Management API', { timeout: 30000 }, () => {
         .send(updateData);
         
       expect(response.status).toBe(200);
-      expect(response.body.salary).toBe(60000);
-      expect(response.body.department).toBe('Management');
+      expect(response.body.data.salary).toBe(60000);
+      expect(response.body.data.department).toBe('Management');
     });
   });
 });

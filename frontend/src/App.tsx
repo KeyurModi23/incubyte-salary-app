@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { Employee, AnalyticsData } from '@/types'
+import { api } from '@/services/api'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { EmployeeDirectory } from '@/components/dashboard/EmployeeDirectory'
 import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts'
@@ -9,18 +9,6 @@ import { Sidebar } from '@/components/dashboard/Sidebar'
 import { Topbar } from '@/components/dashboard/Topbar'
 import { AddEmployeeDialog } from '@/components/dashboard/AddEmployeeDialog'
 import { Toaster } from '@/components/ui/toaster'
-
-const fetchEmployees = async (page: number, limit: number, search?: string) => {
-  const searchParam = search ? `&search=${encodeURIComponent(search)}` : ''
-  const res = await axios.get(`http://localhost:3001/api/employees?page=${page}&limit=${limit}${searchParam}`)
-  return res.data
-}
-
-const fetchAnalytics = async (search?: string) => {
-  const searchParam = search ? `?search=${encodeURIComponent(search)}` : ''
-  const res = await axios.get(`http://localhost:3001/api/analytics${searchParam}`)
-  return res.data
-}
 
 function App() {
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -31,8 +19,17 @@ function App() {
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [page, setPage] = useState(1)
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
 
   const triggerRefresh = () => setRefreshTrigger(prev => prev + 1)
+
+  // Reset page to 1 when search query changes or explicit refresh is triggered
+  useEffect(() => {
+    setPage(1)
+    setHasMore(true)
+  }, [debouncedQuery, refreshTrigger])
 
   // Centralized debounce logic
   useEffect(() => {
@@ -45,7 +42,7 @@ function App() {
   useEffect(() => {
     const loadAnalytics = async () => {
       try {
-        const analyticsData = await fetchAnalytics(debouncedQuery)
+        const analyticsData = await api.analytics.fetch(debouncedQuery)
         setAnalytics(analyticsData)
       } catch (error) {
         console.error("Failed to load analytics", error)
@@ -56,19 +53,33 @@ function App() {
 
   useEffect(() => {
     const loadEmployees = async () => {
-      setLoading(true)
+      if (page === 1) setLoading(true)
+      else setIsFetchingNextPage(true)
+      
       try {
-        const empData = await fetchEmployees(1, 10000, debouncedQuery)
-        setEmployees(empData.data)
+        const empData = await api.employees.fetch(page, 50, debouncedQuery)
+        if (page === 1) {
+          setEmployees(empData.data)
+        } else {
+          setEmployees(prev => [...prev, ...empData.data])
+        }
         setTotal(empData.meta.total)
+        setHasMore(page < empData.meta.totalPages)
       } catch (error) {
         console.error("Failed to load employees", error)
       } finally {
         setLoading(false)
+        setIsFetchingNextPage(false)
       }
     }
     loadEmployees()
-  }, [debouncedQuery, refreshTrigger])
+  }, [debouncedQuery, refreshTrigger, page])
+
+  const fetchNextPage = () => {
+    if (!isFetchingNextPage && !loading && hasMore) {
+      setPage(prev => prev + 1)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans flex overflow-hidden">
@@ -96,6 +107,8 @@ function App() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 onRefresh={triggerRefresh} 
+                fetchNextPage={fetchNextPage}
+                isFetchingNextPage={isFetchingNextPage}
               />
             </div>
           </div>

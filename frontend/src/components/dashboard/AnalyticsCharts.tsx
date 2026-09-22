@@ -8,7 +8,7 @@ type AnalyticsChartsProps = {
   loading: boolean
 }
 
-export function AnalyticsCharts({ analytics, loading }: AnalyticsChartsProps) {
+export function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
       <Card className="shadow-sm border-border bg-card text-card-foreground xl:col-span-2">

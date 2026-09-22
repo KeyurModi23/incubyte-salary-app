@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Users, TrendingUp } from "lucide-react"
+import { Users } from "lucide-react"
 
 type QuickStatsProps = {
   total: number
