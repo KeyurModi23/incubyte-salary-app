@@ -28,28 +28,37 @@ function App() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const triggerRefresh = () => setRefreshTrigger(prev => prev + 1)
+
+  // Centralized debounce logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+    }, 800) // Increased to 800ms for slower typing speeds
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   useEffect(() => {
     const loadAnalytics = async () => {
       try {
-        const analyticsData = await fetchAnalytics(searchQuery)
+        const analyticsData = await fetchAnalytics(debouncedQuery)
         setAnalytics(analyticsData)
       } catch (error) {
         console.error("Failed to load analytics", error)
       }
     }
-    const debounceTimer = setTimeout(loadAnalytics, 300)
-    return () => clearTimeout(debounceTimer)
-  }, [searchQuery, refreshTrigger])
+    loadAnalytics()
+  }, [debouncedQuery, refreshTrigger])
 
   useEffect(() => {
     const loadEmployees = async () => {
       setLoading(true)
       try {
-        const empData = await fetchEmployees(1, 10000, searchQuery)
+        const empData = await fetchEmployees(1, 10000, debouncedQuery)
         setEmployees(empData.data)
         setTotal(empData.meta.total)
       } catch (error) {
@@ -58,20 +67,18 @@ function App() {
         setLoading(false)
       }
     }
-
-    const debounceTimer = setTimeout(loadEmployees, 300)
-    return () => clearTimeout(debounceTimer)
-  }, [searchQuery, refreshTrigger])
+    loadEmployees()
+  }, [debouncedQuery, refreshTrigger])
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans flex">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+    <div className="min-h-screen bg-background text-foreground font-sans flex overflow-hidden">
+      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        <Topbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           <div className="max-w-[1600px] mx-auto">
-            <div className="flex items-center justify-between pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center items-start justify-between pb-6 gap-4">
               <DashboardHeader total={total} />
               <AddEmployeeDialog onSuccess={triggerRefresh} />
             </div>
@@ -83,7 +90,13 @@ function App() {
             </div>
 
             <div className="mt-8">
-              <EmployeeDirectory employees={employees} loading={loading} onRefresh={triggerRefresh} />
+              <EmployeeDirectory 
+                employees={employees} 
+                loading={loading} 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onRefresh={triggerRefresh} 
+              />
             </div>
           </div>
         </main>
