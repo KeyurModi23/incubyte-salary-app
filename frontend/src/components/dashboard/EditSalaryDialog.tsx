@@ -34,7 +34,7 @@ type EditSalaryDialogProps = {
   employeeId: string | number
   currentSalary: number
   employeeName: string
-  onSuccess: () => void
+  onSuccess: (id: string, newSalary: number) => void
 }
 
 export function EditSalaryDialog({ employeeId, currentSalary, employeeName, onSuccess }: EditSalaryDialogProps) {
@@ -67,7 +67,7 @@ export function EditSalaryDialog({ employeeId, currentSalary, employeeName, onSu
       })
       
       setOpen(false)
-      onSuccess() // trigger refetch
+      onSuccess(employeeId as string, Number(values.salary)) // trigger local state update
     } catch (error) {
       toast({
         title: 'Error',

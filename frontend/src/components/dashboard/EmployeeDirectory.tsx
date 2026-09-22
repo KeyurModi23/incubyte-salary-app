@@ -11,12 +11,12 @@ type EmployeeDirectoryProps = {
   loading: boolean
   searchQuery: string
   setSearchQuery: (query: string) => void
-  onRefresh: () => void
+  onEditSuccess: (id: string, newSalary: number) => void
   fetchNextPage?: () => void
   isFetchingNextPage?: boolean
 }
 
-export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQuery, onRefresh, fetchNextPage, isFetchingNextPage }: EmployeeDirectoryProps) {
+export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQuery, onEditSuccess, fetchNextPage, isFetchingNextPage }: EmployeeDirectoryProps) {
   const [isMobile, setIsMobile] = useState(false)
   
   // Need to use layout effect or early mount effect for initial window size
@@ -133,7 +133,7 @@ export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQu
                             employeeId={employee.id}
                             currentSalary={employee.salary}
                             employeeName={`${employee.firstName} ${employee.lastName}`}
-                            onSuccess={onRefresh}
+                            onSuccess={(id, newSalary) => onEditSuccess(id as string, newSalary)}
                           />
                         </div>
                       </div>
@@ -171,7 +171,7 @@ export function EmployeeDirectory({ employees, loading, searchQuery, setSearchQu
                           employeeId={employee.id}
                           currentSalary={employee.salary}
                           employeeName={`${employee.firstName} ${employee.lastName}`}
-                          onSuccess={onRefresh}
+                          onSuccess={(id, newSalary) => onEditSuccess(id as string, newSalary)}
                         />
                       </div>
                     </div>
