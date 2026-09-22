@@ -18,12 +18,21 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [page, setPage] = useState(1)
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
   const [hasMore, setHasMore] = useState(true)
 
-  const triggerRefresh = () => setRefreshTrigger(prev => prev + 1)
+  const triggerRefresh = () => {
+    setRefreshTrigger(prev => prev + 1)
+    setAnalyticsRefreshTrigger(prev => prev + 1)
+  }
+
+  const handleEditSuccess = (id: string, newSalary: number) => {
+    setEmployees(prev => prev.map(emp => emp.id === id ? { ...emp, salary: newSalary } : emp))
+    setAnalyticsRefreshTrigger(prev => prev + 1)
+  }
 
   // Reset page to 1 when search query changes or explicit refresh is triggered
   useEffect(() => {
@@ -49,7 +58,7 @@ function App() {
       }
     }
     loadAnalytics()
-  }, [debouncedQuery, refreshTrigger])
+  }, [debouncedQuery, analyticsRefreshTrigger])
 
   useEffect(() => {
     const loadEmployees = async () => {
@@ -106,7 +115,7 @@ function App() {
                 loading={loading} 
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
-                onRefresh={triggerRefresh} 
+                onEditSuccess={handleEditSuccess} 
                 fetchNextPage={fetchNextPage}
                 isFetchingNextPage={isFetchingNextPage}
               />

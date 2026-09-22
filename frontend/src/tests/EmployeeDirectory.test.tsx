@@ -48,7 +48,7 @@ describe('EmployeeDirectory Component', () => {
         loading={true} 
         searchQuery="" 
         setSearchQuery={() => {}} 
-        onRefresh={() => {}} 
+        onEditSuccess={() => {}} 
         fetchNextPage={() => {}} 
         isFetchingNextPage={false} 
       />
@@ -66,7 +66,7 @@ describe('EmployeeDirectory Component', () => {
         loading={false} 
         searchQuery="NonexistentUser" 
         setSearchQuery={() => {}} 
-        onRefresh={() => {}} 
+        onEditSuccess={() => {}} 
         fetchNextPage={() => {}} 
         isFetchingNextPage={false} 
       />
@@ -82,7 +82,7 @@ describe('EmployeeDirectory Component', () => {
         loading={false} 
         searchQuery="" 
         setSearchQuery={() => {}} 
-        onRefresh={() => {}} 
+        onEditSuccess={() => {}} 
         fetchNextPage={() => {}} 
         isFetchingNextPage={false} 
       />
