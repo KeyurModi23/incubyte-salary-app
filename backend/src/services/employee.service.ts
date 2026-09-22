@@ -23,7 +23,10 @@ export const EmployeeService = {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: [
+          { createdAt: 'desc' },
+          { id: 'asc' }
+        ],
       }),
       prisma.employee.count({ where }),
     ]);
