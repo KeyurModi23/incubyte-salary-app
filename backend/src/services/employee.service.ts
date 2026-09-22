@@ -4,13 +4,19 @@ export const EmployeeService = {
   getEmployees: async (page: number, limit: number, search?: string) => {
     const skip = (page - 1) * limit;
 
-    const where = search ? {
-      OR: [
-        { id: { contains: search, mode: 'insensitive' as const } },
-        { firstName: { contains: search, mode: 'insensitive' as const } },
-        { lastName: { contains: search, mode: 'insensitive' as const } },
-      ]
-    } : {};
+    let where = {};
+    if (search) {
+      const searchTerms = search.split(' ').filter(term => term.trim().length > 0);
+      where = {
+        AND: searchTerms.map(term => ({
+          OR: [
+            { id: { contains: term, mode: 'insensitive' as const } },
+            { firstName: { contains: term, mode: 'insensitive' as const } },
+            { lastName: { contains: term, mode: 'insensitive' as const } },
+          ]
+        }))
+      };
+    }
 
     const [employees, total] = await Promise.all([
       prisma.employee.findMany({
@@ -47,13 +53,19 @@ export const EmployeeService = {
   },
 
   getAnalytics: async (search?: string) => {
-    const where = search ? {
-      OR: [
-        { id: { contains: search, mode: 'insensitive' as const } },
-        { firstName: { contains: search, mode: 'insensitive' as const } },
-        { lastName: { contains: search, mode: 'insensitive' as const } },
-      ]
-    } : {};
+    let where = {};
+    if (search) {
+      const searchTerms = search.split(' ').filter(term => term.trim().length > 0);
+      where = {
+        AND: searchTerms.map(term => ({
+          OR: [
+            { id: { contains: term, mode: 'insensitive' as const } },
+            { firstName: { contains: term, mode: 'insensitive' as const } },
+            { lastName: { contains: term, mode: 'insensitive' as const } },
+          ]
+        }))
+      };
+    }
 
     const [departmentData, countryData] = await Promise.all([
       prisma.employee.groupBy({
